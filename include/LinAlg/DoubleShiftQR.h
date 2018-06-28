@@ -235,7 +235,7 @@ private:
     }
 
 public:
-    DoubleShiftQR(int size) :
+    DoubleShiftQR(arma::blas_int size) :
         n(size),
         prec(std::numeric_limits<Scalar>::epsilon()),
         eps_rel(std::pow(prec, Scalar(0.75))),
@@ -275,7 +275,7 @@ public:
 
         // Obtain the indices of zero elements in the subdiagonal,
         // so that H can be divided into several blocks
-        std::vector<int> zero_ind;
+        std::vector<arma::blas_int> zero_ind;
         zero_ind.reserve(n - 1);
         zero_ind.push_back(0);
         Scalar *Hii = mat_H.memptr();
@@ -294,7 +294,7 @@ public:
         }
         zero_ind.push_back(n);
 
-        for(std::vector<int>::size_type i = 0; i < zero_ind.size() - 1; i++)
+        for(std::vector<arma::blas_int>::size_type i = 0; i < zero_ind.size() - 1; i++)
         {
             Index start = zero_ind[i];
             Index end = zero_ind[i + 1] - 1;
@@ -321,7 +321,7 @@ public:
             throw std::logic_error("DoubleShiftQR: need to call compute() first");
 
         Scalar *y_ptr = y.memptr();
-        for(int i = 0; i < n - 1; i++, y_ptr++)
+        for(arma::blas_int i = 0; i < n - 1; i++, y_ptr++)
         {
             apply_PX(y_ptr, i);
         }
@@ -334,8 +334,8 @@ public:
         if(!computed)
             throw std::logic_error("DoubleShiftQR: need to call compute() first");
 
-        int nrow = Y.n_rows;
-        for(int i = 0; i < n - 2; i++)
+        arma::blas_int nrow = Y.n_rows;
+        for(arma::blas_int i = 0; i < n - 2; i++)
         {
             apply_XP(Y, 0, i, nrow, 3, i);
         }

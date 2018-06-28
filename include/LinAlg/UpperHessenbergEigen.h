@@ -11,7 +11,7 @@
 #include <cmath>
 #include <complex>
 #include <stdexcept>
-#include "LapackWrapperExtra.h"
+//#include "LapackWrapperExtra.h"
 
 ///
 /// \ingroup LinearAlgebra
@@ -35,7 +35,7 @@ private:
     typedef arma::Mat<Complex> ComplexMatrix;
     typedef arma::Col<Complex> ComplexVector;
 
-    int n;
+    arma::blas_int n;
     Matrix mat_Z;         // In the first stage, H = ZTZ', Z is an orthogonal matrix
                           // In the second stage, Z will be overwritten by the eigenvectors of H
     Matrix mat_T;         // H = ZTZ', T is a Schur form matrix
@@ -94,16 +94,16 @@ public:
         // mat_T = mat;
         std::copy(mat.memptr(), mat.memptr() + mat.n_elem, mat_T.memptr());
 
-        int want_T = 1, want_Z = 1;
-        int ilo = 1, ihi = n, iloz = 1, ihiz = n;
+        arma::blas_int want_T = 1, want_Z = 1;
+        arma::blas_int ilo = 1, ihi = n, iloz = 1, ihiz = n;
         Scalar *wr = new Scalar[n];
         Scalar *wi = new Scalar[n];
-        int info;
+        arma::blas_int info;
         arma::lapack::lahqr(&want_T, &want_Z, &n, &ilo, &ihi,
                             mat_T.memptr(), &n, wr, wi, &iloz, &ihiz,
                             mat_Z.memptr(), &n, &info);
 
-        for(int i = 0; i < n; i++)
+        for(arma::blas_int i = 0; i < n; i++)
         {
             evals[i] = Complex(wr[i], wi[i]);
         }
@@ -115,7 +115,7 @@ public:
 
         char side = 'R', howmny = 'B';
         Scalar *work = new Scalar[3 * n];
-        int m;
+        arma::blas_int m;
 
         arma::lapack::trevc(&side, &howmny, (int*) NULL, &n, mat_T.memptr(), &n,
                             (Scalar*) NULL, &n, mat_Z.memptr(), &n, &n, &m, work, &info);
@@ -155,13 +155,13 @@ public:
         Scalar prec = std::pow(std::numeric_limits<Scalar>::epsilon(), Scalar(2.0) / 3);
         ComplexMatrix evecs(n, n);
         Complex *col_ptr = evecs.memptr();
-        for(int i = 0; i < n; i++)
+        for(arma::blas_int i = 0; i < n; i++)
         {
             if(is_real(evals[i], prec))
             {
                 // For real eigenvector, normalize and copy
                 Scalar z_norm = arma::norm(mat_Z.col(i));
-                for(int j = 0; j < n; j++)
+                for(arma::blas_int j = 0; j < n; j++)
                 {
                     col_ptr[j] = Complex(mat_Z(j, i) / z_norm, 0);
                 }
@@ -173,7 +173,7 @@ public:
                 Scalar i2 = arma::dot(mat_Z.col(i + 1), mat_Z.col(i + 1));
                 Scalar z_norm = std::sqrt(r2 + i2);
                 Scalar *z_ptr = mat_Z.colptr(i);
-                for(int j = 0; j < n; j++)
+                for(arma::blas_int j = 0; j < n; j++)
                 {
                     col_ptr[j] = Complex(z_ptr[j] / z_norm, z_ptr[j + n] / z_norm);
                     col_ptr[j + n] = std::conj(col_ptr[j]);

@@ -26,7 +26,7 @@ private:
     typedef arma::Col<Scalar> Vector;
 
     const Matrix mat;
-    const int dim_n;
+    const arma::blas_int dim_n;
     SymmetricLDL<Scalar> solver;
 public:
     ///
@@ -46,11 +46,11 @@ public:
     ///
     /// Return the number of rows of the underlying matrix.
     ///
-    int rows() { return dim_n; }
+    arma::blas_int rows() { return dim_n; }
     ///
     /// Return the number of columns of the underlying matrix.
     ///
-    int cols() { return dim_n; }
+    arma::blas_int cols() { return dim_n; }
 
     ///
     /// Set the real shift \f$\sigma\f$.

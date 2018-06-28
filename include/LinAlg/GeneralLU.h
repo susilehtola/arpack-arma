@@ -9,7 +9,7 @@
 
 #include <armadillo>
 #include <stdexcept>
-#include "LapackWrapperExtra.h"
+//#include "LapackWrapperExtra.h"
 
 ///
 /// \defgroup LinearAlgebra Linear Algebra
@@ -32,9 +32,9 @@ class GeneralLU
 private:
     typedef arma::Mat<Scalar> Matrix;
     typedef arma::Col<Scalar> Vector;
-    typedef arma::Col<int> IntVector;
+    typedef arma::Col<arma::blas_int> IntVector;
 
-    int dim_n;          // size of the matrix
+    arma::blas_int dim_n;          // size of the matrix
     Matrix mat_fac;     // storing factorization structures
     IntVector vec_fac;  // storing factorization structures
     bool computed;      // whether factorization has been computed
@@ -78,7 +78,7 @@ public:
         mat_fac = mat;
         vec_fac.set_size(dim_n);
 
-        int info;
+        arma::blas_int info;
         arma::lapack::getrf(&dim_n, &dim_n, mat_fac.memptr(), &dim_n,
                             vec_fac.memptr(), &info);
 
@@ -108,9 +108,9 @@ public:
 
         vec_out = vec_in;
 
-        int one = 1;
+        arma::blas_int one = 1;
         char no_trans = 'N';
-        int info;
+        arma::blas_int info;
         arma::lapack::getrs(&no_trans, &dim_n, &one, mat_fac.memptr(), &dim_n,
                             vec_fac.memptr(), vec_out.memptr(), &dim_n, &info);
         if(info < 0)

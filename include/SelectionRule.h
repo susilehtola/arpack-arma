@@ -92,7 +92,7 @@ public:
 // The minus sign is due to the fact that std::sort() sorts in ascending order.
 
 // Default target: throw an exceptoin
-template <typename Scalar, int SelectionRule>
+template <typename Scalar, arma::blas_int SelectionRule>
 class SortingTarget
 {
 public:
@@ -224,7 +224,7 @@ public:
     }
 };
 
-template <typename T, int SelectionRule>
+template <typename T, arma::blas_int SelectionRule>
 class SortEigenvalue
 {
 private:
@@ -236,10 +236,10 @@ private:
     std::vector<PairType> pair_sort;
 
 public:
-    SortEigenvalue(const T* start, int size) :
+    SortEigenvalue(const T* start, arma::blas_int size) :
         pair_sort(size)
     {
-        for(int i = 0; i < size; i++)
+        for(arma::blas_int i = 0; i < size; i++)
         {
             pair_sort[i].first = SortingTarget<T, SelectionRule>::get(start[i]);
             pair_sort[i].second = i;
@@ -248,10 +248,10 @@ public:
         std::sort(pair_sort.begin(), pair_sort.end(), comp);
     }
 
-    std::vector<int> index()
+    std::vector<arma::blas_int> index()
     {
-        std::vector<int> ind(pair_sort.size());
-        for(unsigned int i = 0; i < ind.size(); i++)
+        std::vector<arma::blas_int> ind(pair_sort.size());
+        for(size_t i = 0; i < ind.size(); i++)
             ind[i] = pair_sort[i].second;
 
         return ind;

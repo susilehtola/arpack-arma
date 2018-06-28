@@ -325,7 +325,7 @@ public:
         Scalar *c = rot_cos.memptr(),
                *s = rot_sin.memptr();
         /*Vector Yi(Y.n_rows);
-        for(int i = 0; i < n - 1; i++)
+        for(arma::blas_int i = 0; i < n - 1; i++)
         {
             // Y[, i:(i + 1)] = Y[, i:(i + 1)] * Gi
             // Gi = [ cos[i]  sin[i]]

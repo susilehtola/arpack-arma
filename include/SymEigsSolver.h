@@ -72,7 +72,7 @@
 /// #include <armadillo>
 /// #include <SymEigsSolver.h>  // Also includes <MatOp/DenseGenMatProd.h>
 ///
-/// int main()
+/// arma::blas_int main()
 /// {
 ///     // We are going to calculate the eigenvalues of M
 ///     arma::mat A = arma::randu(10, 10);
@@ -86,7 +86,7 @@
 ///
 ///     // Initialize and compute
 ///     eigs.init();
-///     int nconv = eigs.compute();
+///     arma::blas_int nconv = eigs.compute();
 ///
 ///     // Retrieve results
 ///     arma::vec evalues;
@@ -109,19 +109,19 @@
 /// class MyDiagonalTen
 /// {
 /// public:
-///     int rows() { return 10; }
-///     int cols() { return 10; }
+///     arma::blas_int rows() { return 10; }
+///     arma::blas_int cols() { return 10; }
 ///     // y_out = M * x_in
 ///     void perform_op(double *x_in, double *y_out)
 ///     {
-///         for(int i = 0; i < rows(); i++)
+///         for(arma::blas_int i = 0; i < rows(); i++)
 ///         {
 ///             y_out[i] = x_in[i] * (i + 1);
 ///         }
 ///     }
 /// };
 ///
-/// int main()
+/// arma::blas_int main()
 /// {
 ///     MyDiagonalTen op;
 ///     SymEigsSolver<double, LARGEST_ALGE, MyDiagonalTen> eigs(&op, 3, 6);
@@ -135,7 +135,7 @@
 /// \endcode
 ///
 template < typename Scalar = double,
-           int SelectionRule = LARGEST_MAGN,
+           arma::blas_int SelectionRule = LARGEST_MAGN,
            typename OpType = DenseGenMatProd<double> >
 class SymEigsSolver
 {
@@ -149,15 +149,15 @@ protected:
                           // e.g. matrix-vector product
 
 private:
-    const int dim_n;      // dimension of matrix A
+    const arma::blas_int dim_n;      // dimension of matrix A
 
 protected:
-    const int nev;        // number of eigenvalues requested
+    const arma::blas_int nev;        // number of eigenvalues requested
 
 private:
-    const int ncv;        // number of ritz values
-    int nmatop;           // number of matrix operations called
-    int niter;            // number of restarting iterations
+    const arma::blas_int ncv;        // number of ritz values
+    arma::blas_int nmatop;           // number of matrix operations called
+    arma::blas_int niter;            // number of restarting iterations
 
     Matrix fac_V;         // V matrix in the Arnoldi factorization
     Matrix fac_H;         // H matrix in the Arnoldi factorization
@@ -176,16 +176,16 @@ private:
                           // e.g. ~= 1e-16 for the "double" type
 
     // Arnoldi factorization starting from step-k
-    inline void factorize_from(int from_k, int to_m, const Vector &fk);
+    inline void factorize_from(arma::blas_int from_k, arma::blas_int to_m, const Vector &fk);
 
     // Implicitly restarted Arnoldi factorization
-    inline void restart(int k);
+    inline void restart(arma::blas_int k);
 
     // Calculate the number of converged Ritz values
-    inline int num_converged(Scalar tol);
+    inline arma::blas_int num_converged(Scalar tol);
 
     // Return the adjusted nev for restarting
-    inline int nev_adjusted(int nconv);
+    inline arma::blas_int nev_adjusted(arma::blas_int nconv);
 
     // Retrieve and sort ritz values and ritz vectors
     inline void retrieve_ritzpair();
@@ -213,7 +213,7 @@ public:
     ///             in each iteration. This parameter must satisfy \f$nev < ncv \le n\f$,
     ///             and is advised to take \f$ncv \ge 2\cdot nev\f$.
     ///
-    SymEigsSolver(OpType *op_, int nev_, int ncv_) :
+    SymEigsSolver(OpType *op_, arma::blas_int nev_, arma::blas_int ncv_) :
         op(op_),
         dim_n(op->rows()),
         nev(nev_),
@@ -257,17 +257,17 @@ public:
     ///
     /// \return Number of converged eigenvalues.
     ///
-    inline int compute(int maxit = 1000, Scalar tol = 1e-10);
+    inline arma::blas_int compute(arma::blas_int maxit = 1000, Scalar tol = 1e-10);
 
     ///
     /// Returning the number of iterations used in the computation.
     ///
-    inline int num_iterations() { return niter; }
+    inline arma::blas_int num_iterations() { return niter; }
 
     ///
     /// Returning the number of matrix operations used in the computation.
     ///
-    inline int num_operations() { return nmatop; }
+    inline arma::blas_int num_operations() { return nmatop; }
 
     ///
     /// Returning the converged eigenvalues.
@@ -287,7 +287,7 @@ public:
     /// Returned matrix type will be `arma::mat` or `arma::fmat`, depending on
     /// the template parameter `Scalar` defined.
     ///
-    inline Matrix eigenvectors(int nvec);
+    inline Matrix eigenvectors(arma::blas_int nvec);
     ///
     /// Returning all converged eigenvectors.
     ///
@@ -355,11 +355,11 @@ public:
 /// #include <armadillo>
 /// #include <SymEigsSolver.h>  // Also includes <MatOp/DenseSymShiftSolve.h>
 ///
-/// int main()
+/// arma::blas_int main()
 /// {
 ///     // A size-10 diagonal matrix with elements 1, 2, ..., 10
 ///     arma::mat M(10, 10, arma::fill::zeros);
-///     for(int i = 0; i < M.n_rows; i++)
+///     for(arma::blas_int i = 0; i < M.n_rows; i++)
 ///         M(i, i) = i + 1;
 ///
 ///     // Construct matrix operation object using the wrapper class
@@ -391,21 +391,21 @@ public:
 /// private:
 ///     double sigma_;
 /// public:
-///     int rows() { return 10; }
-///     int cols() { return 10; }
+///     arma::blas_int rows() { return 10; }
+///     arma::blas_int cols() { return 10; }
 ///     void set_shift(double sigma) { sigma_ = sigma; }
 ///     // y_out = inv(A - sigma * I) * x_in
 ///     // inv(A - sigma * I) = diag(1/(1-sigma), 1/(2-sigma), ...)
 ///     void perform_op(double *x_in, double *y_out)
 ///     {
-///         for(int i = 0; i < rows(); i++)
+///         for(arma::blas_int i = 0; i < rows(); i++)
 ///         {
 ///             y_out[i] = x_in[i] / (i + 1 - sigma_);
 ///         }
 ///     }
 /// };
 ///
-/// int main()
+/// arma::blas_int main()
 /// {
 ///     MyDiagonalTenShiftSolve op;
 ///     // Find three eigenvalues that are closest to 3.14
@@ -421,7 +421,7 @@ public:
 /// \endcode
 ///
 template <typename Scalar = double,
-          int SelectionRule = LARGEST_MAGN,
+          arma::blas_int SelectionRule = LARGEST_MAGN,
           typename OpType = DenseSymShiftSolve<double> >
 class SymEigsShiftSolver: public SymEigsSolver<Scalar, SelectionRule, OpType>
 {
@@ -456,7 +456,7 @@ public:
     ///               and is advised to take \f$ncv \ge 2\cdot nev\f$.
     /// \param sigma_ The value of the shift.
     ///
-    SymEigsShiftSolver(OpType *op_, int nev_, int ncv_, Scalar sigma_) :
+    SymEigsShiftSolver(OpType *op_, arma::blas_int nev_, arma::blas_int ncv_, Scalar sigma_) :
         SymEigsSolver<Scalar, SelectionRule, OpType>(op_, nev_, ncv_),
         sigma(sigma_)
     {

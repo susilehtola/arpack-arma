@@ -41,11 +41,11 @@ public:
     ///
     /// Return the number of rows of the underlying matrix.
     ///
-    int rows() { return mat->n_rows; }
+    arma::blas_int rows() { return mat->n_rows; }
     ///
     /// Return the number of columns of the underlying matrix.
     ///
-    int cols() { return mat->n_cols; }
+    arma::blas_int cols() { return mat->n_cols; }
 
     ///
     /// Perform the matrix-vector multiplication operation \f$y=Ax\f$.

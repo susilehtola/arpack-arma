@@ -6,9 +6,9 @@
 
 // Arnoldi factorization starting from step-k
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline void GenEigsSolver<Scalar, SelectionRule, OpType>::factorize_from(int from_k, int to_m, const Vector &fk)
+inline void GenEigsSolver<Scalar, SelectionRule, OpType>::factorize_from(arma::blas_int from_k, arma::blas_int to_m, const Vector &fk)
 {
     if(to_m <= from_k) return;
 
@@ -19,7 +19,7 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::factorize_from(int fro
     // Keep the upperleft k x k submatrix of H and set other elements to 0
     fac_H.tail_cols(ncv - from_k).zeros();
     fac_H.submat(arma::span(from_k, ncv - 1), arma::span(0, from_k - 1)).zeros();
-    for(int i = from_k; i <= to_m - 1; i++)
+    for(arma::blas_int i = from_k; i <= to_m - 1; i++)
     {
         bool restart = false;
         // If beta = 0, then the next V is not full rank
@@ -69,7 +69,7 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::factorize_from(int fro
         // whether V' * (f/||f||) ~= 0
         Vector Vf = Vs.t() * fac_f;
         // If not, iteratively correct the residual
-        int count = 0;
+        arma::blas_int count = 0;
         while(count < 5 && arma::abs(Vf).max() > prec * beta)
         {
             // f <- f - V * Vf
@@ -87,9 +87,9 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::factorize_from(int fro
 
 // Implicitly restarted Arnoldi factorization
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline void GenEigsSolver<Scalar, SelectionRule, OpType>::restart(int k)
+inline void GenEigsSolver<Scalar, SelectionRule, OpType>::restart(arma::blas_int k)
 {
     if(k >= ncv)
         return;
@@ -98,7 +98,7 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::restart(int k)
     UpperHessenbergQR<Scalar> decomp;
     Matrix Q(ncv, ncv, arma::fill::eye);
 
-    for(int i = k; i < ncv; i++)
+    for(arma::blas_int i = k; i < ncv; i++)
     {
         if(is_complex(ritz_val[i], prec) && is_conj(ritz_val[i], ritz_val[i + 1], prec))
         {
@@ -139,8 +139,8 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::restart(int k)
     // Q has some elements being zero
     // The first (ncv - k + i) elements of the i-th column of Q are non-zero
     Matrix Vs(dim_n, k + 1);
-    int nnz;
-    for(int i = 0; i < k; i++)
+    arma::blas_int nnz;
+    for(arma::blas_int i = 0; i < k; i++)
     {
         nnz = ncv - k + i + 1;
         Matrix V(fac_V.memptr(), dim_n, nnz, false);
@@ -158,13 +158,13 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::restart(int k)
 
 // Calculate the number of converged Ritz values
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline int GenEigsSolver<Scalar, SelectionRule, OpType>::num_converged(Scalar tol)
+inline arma::blas_int GenEigsSolver<Scalar, SelectionRule, OpType>::num_converged(Scalar tol)
 {
     // thresh = tol * max(prec, abs(theta)), theta for ritz value
     const Scalar f_norm = arma::norm(fac_f);
-    for(int i = 0; i < nev; i++)
+    for(arma::blas_int i = 0; i < nev; i++)
     {
         Scalar thresh = tol * std::max(prec, std::abs(ritz_val[i]));
         Scalar resid = std::abs(ritz_vec(ncv - 1, i)) * f_norm;
@@ -176,11 +176,11 @@ inline int GenEigsSolver<Scalar, SelectionRule, OpType>::num_converged(Scalar to
 
 // Return the adjusted nev for restarting
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline int GenEigsSolver<Scalar, SelectionRule, OpType>::nev_adjusted(int nconv)
+inline arma::blas_int GenEigsSolver<Scalar, SelectionRule, OpType>::nev_adjusted(arma::blas_int nconv)
 {
-    int nev_new = nev;
+    arma::blas_int nev_new = nev;
 
     // Increase nev by one if ritz_val[nev - 1] and
     // ritz_val[nev] are conjugate pairs
@@ -211,7 +211,7 @@ inline int GenEigsSolver<Scalar, SelectionRule, OpType>::nev_adjusted(int nconv)
 
 // Retrieve and sort ritz values and ritz vectors
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
 inline void GenEigsSolver<Scalar, SelectionRule, OpType>::retrieve_ritzpair()
 {
@@ -223,14 +223,14 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::retrieve_ritzpair()
     ComplexMatrix evecs = decomp.eigenvectors();
 
     SortEigenvalue<Complex, SelectionRule> sorting(evals.memptr(), evals.n_elem);
-    std::vector<int> ind = sorting.index();
+    std::vector<arma::blas_int> ind = sorting.index();
 
     // Copy the ritz values and vectors to ritz_val and ritz_vec, respectively
-    for(int i = 0; i < ncv; i++)
+    for(arma::blas_int i = 0; i < ncv; i++)
     {
         ritz_val[i] = evals[ind[i]];
     }
-    for(int i = 0; i < nev; i++)
+    for(arma::blas_int i = 0; i < nev; i++)
     {
         ritz_vec.col(i) = evecs.col(ind[i]);
     }
@@ -241,18 +241,18 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::retrieve_ritzpair()
 // Sort the first nev Ritz pairs in decreasing magnitude order
 // This is used to return the final results
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
 inline void GenEigsSolver<Scalar, SelectionRule, OpType>::sort_ritzpair()
 {
     SortEigenvalue<Complex, LARGEST_MAGN> sorting(ritz_val.memptr(), nev);
-    std::vector<int> ind = sorting.index();
+    std::vector<arma::blas_int> ind = sorting.index();
 
     ComplexVector new_ritz_val(ncv);
     ComplexMatrix new_ritz_vec(ncv, nev);
     BoolVector new_ritz_conv(nev);
 
-    for(int i = 0; i < nev; i++)
+    for(arma::blas_int i = 0; i < nev; i++)
     {
         new_ritz_val[i] = ritz_val[ind[i]];
         new_ritz_vec.col(i) = ritz_vec.col(ind[i]);
@@ -268,7 +268,7 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::sort_ritzpair()
 
 // Initialization and clean-up
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
 inline void GenEigsSolver<Scalar, SelectionRule, OpType>::init(Scalar *init_resid)
 {
@@ -301,7 +301,7 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::init(Scalar *init_resi
 
 // Initialization with random initial coefficients
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
 inline void GenEigsSolver<Scalar, SelectionRule, OpType>::init()
 {
@@ -312,15 +312,15 @@ inline void GenEigsSolver<Scalar, SelectionRule, OpType>::init()
 
 // Compute Ritz pairs and return the number of converged eigenvalues
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline int GenEigsSolver<Scalar, SelectionRule, OpType>::compute(int maxit, Scalar tol)
+inline arma::blas_int GenEigsSolver<Scalar, SelectionRule, OpType>::compute(arma::blas_int maxit, Scalar tol)
 {
     // The m-step Arnoldi factorization
     factorize_from(1, ncv, fac_f);
     retrieve_ritzpair();
     // Restarting
-    int i, nconv = 0, nev_adj;
+    arma::blas_int i, nconv = 0, nev_adj;
     for(i = 0; i < maxit; i++)
     {
         nconv = num_converged(tol);
@@ -340,18 +340,18 @@ inline int GenEigsSolver<Scalar, SelectionRule, OpType>::compute(int maxit, Scal
 
 // Return converged eigenvalues
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
 inline typename GenEigsSolver<Scalar, SelectionRule, OpType>::ComplexVector GenEigsSolver<Scalar, SelectionRule, OpType>::eigenvalues()
 {
-    int nconv = std::count(ritz_conv.begin(), ritz_conv.end(), true);
+    arma::blas_int nconv = std::count(ritz_conv.begin(), ritz_conv.end(), true);
     ComplexVector res(nconv);
 
     if(!nconv)
         return res;
 
-    int j = 0;
-    for(int i = 0; i < nev; i++)
+    arma::blas_int j = 0;
+    for(arma::blas_int i = 0; i < nev; i++)
     {
         if(ritz_conv[i])
         {
@@ -365,11 +365,11 @@ inline typename GenEigsSolver<Scalar, SelectionRule, OpType>::ComplexVector GenE
 
 // Return converged eigenvectors
 template < typename Scalar,
-           int SelectionRule,
+           arma::blas_int SelectionRule,
            typename OpType >
-inline typename GenEigsSolver<Scalar, SelectionRule, OpType>::ComplexMatrix GenEigsSolver<Scalar, SelectionRule, OpType>::eigenvectors(int nvec)
+inline typename GenEigsSolver<Scalar, SelectionRule, OpType>::ComplexMatrix GenEigsSolver<Scalar, SelectionRule, OpType>::eigenvectors(arma::blas_int nvec)
 {
-    int nconv = std::count(ritz_conv.begin(), ritz_conv.end(), true);
+    arma::blas_int nconv = std::count(ritz_conv.begin(), ritz_conv.end(), true);
     nvec = std::min(nvec, nconv);
     ComplexMatrix res(dim_n, nvec);
 
@@ -377,8 +377,8 @@ inline typename GenEigsSolver<Scalar, SelectionRule, OpType>::ComplexMatrix GenE
         return res;
 
     ComplexMatrix ritz_vec_conv(ncv, nvec);
-    int j = 0;
-    for(int i = 0; i < nev && j < nvec; i++)
+    arma::blas_int j = 0;
+    for(arma::blas_int i = 0; i < nev && j < nvec; i++)
     {
         if(ritz_conv[i])
         {

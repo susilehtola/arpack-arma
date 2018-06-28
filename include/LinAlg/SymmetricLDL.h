@@ -9,7 +9,7 @@
 
 #include <armadillo>
 #include <stdexcept>
-#include "LapackWrapperExtra.h"
+//#include "LapackWrapperExtra.h"
 
 ///
 /// \ingroup LinearAlgebra
@@ -27,9 +27,9 @@ class SymmetricLDL
 private:
     typedef arma::Mat<Scalar> Matrix;
     typedef arma::Col<Scalar> Vector;
-    typedef arma::Col<int> IntVector;
+    typedef arma::Col<arma::blas_int> IntVector;
 
-    int dim_n;          // size of the matrix
+    arma::blas_int dim_n;          // size of the matrix
     char mat_uplo;      // whether using lower triangle or upper triangle
     Matrix mat_fac;     // storing factorization structures
     IntVector vec_fac;  // storing factorization structures
@@ -81,7 +81,7 @@ public:
         vec_fac.set_size(dim_n);
 
         Scalar lwork_query;
-        int lwork = -1, info;
+        arma::blas_int lwork = -1, info;
         arma::lapack::sytrf(&mat_uplo, &dim_n, mat_fac.memptr(), &dim_n,
                             vec_fac.memptr(), &lwork_query, &lwork, &info);
         lwork = int(lwork_query);
@@ -117,8 +117,8 @@ public:
 
         vec_out = vec_in;
 
-        int one = 1;
-        int info;
+        arma::blas_int one = 1;
+        arma::blas_int info;
         arma::lapack::sytrs(&mat_uplo, &dim_n, &one, mat_fac.memptr(), &dim_n,
                             vec_fac.memptr(), vec_out.memptr(), &dim_n, &info);
         if(info < 0)

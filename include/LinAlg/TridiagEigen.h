@@ -9,7 +9,7 @@
 
 #include <armadillo>
 #include <stdexcept>
-#include "LapackWrapperExtra.h"
+//#include "LapackWrapperExtra.h"
 
 ///
 /// \ingroup LinearAlgebra
@@ -28,7 +28,7 @@ private:
     typedef arma::Mat<Scalar> Matrix;
     typedef arma::Col<Scalar> Vector;
 
-    int n;
+    arma::blas_int n;
     Vector main_diag;     // Main diagonal elements of the matrix
     Vector sub_diag;      // Sub-diagonal elements of the matrix
     Matrix evecs;         // To store eigenvectors
@@ -78,11 +78,11 @@ public:
         evecs.set_size(n, n);
 
         char compz = 'I';
-        int lwork = -1;
+        arma::blas_int lwork = -1;
         Scalar lwork_opt;
 
-        int liwork = -1;
-        int liwork_opt, info;
+        arma::blas_int liwork = -1;
+        arma::blas_int liwork_opt, info;
 
         // Query of lwork and liwork
         arma::lapack::stedc(&compz, &n, main_diag.memptr(), sub_diag.memptr(),
@@ -98,7 +98,7 @@ public:
         }
 
         Scalar *work = new Scalar[lwork];
-        int *iwork = new int[liwork];
+        arma::blas_int *iwork = new arma::blas_int[liwork];
 
         arma::lapack::stedc(&compz, &n, main_diag.memptr(), sub_diag.memptr(),
                             evecs.memptr(), &n, work, &lwork, iwork, &liwork, &info);

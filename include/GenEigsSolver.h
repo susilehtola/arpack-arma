@@ -64,7 +64,7 @@
 ///
 ///     // Initialize and compute
 ///     eigs.init();
-///     int nconv = eigs.compute();
+///     arma::blas_int nconv = eigs.compute();
 ///
 ///     // Retrieve results
 ///     arma::cx_vec evalues;
@@ -78,7 +78,7 @@
 /// \endcode
 ///
 template < typename Scalar = double,
-           int SelectionRule = LARGEST_MAGN,
+           arma::blas_int SelectionRule = LARGEST_MAGN,
            typename OpType = DenseGenMatProd<double> >
 class GenEigsSolver
 {
@@ -96,15 +96,15 @@ protected:
                             // e.g. matrix-vector product
 
 private:
-    const int dim_n;        // dimension of matrix A
+    const arma::blas_int dim_n;        // dimension of matrix A
 
 protected:
-    const int nev;          // number of eigenvalues requested
+    const arma::blas_int nev;          // number of eigenvalues requested
 
 private:
-    const int ncv;          // number of ritz values
-    int nmatop;             // number of matrix operations called
-    int niter;              // number of restarting iterations
+    const arma::blas_int ncv;          // number of ritz values
+    arma::blas_int nmatop;             // number of matrix operations called
+    arma::blas_int niter;              // number of restarting iterations
 
     Matrix fac_V;           // V matrix in the Arnoldi factorization
     Matrix fac_H;           // H matrix in the Arnoldi factorization
@@ -123,7 +123,7 @@ private:
                             // e.g. ~= 1e-16 for the "double" type
 
     // Arnoldi factorization starting from step-k
-    inline void factorize_from(int from_k, int to_m, const Vector &fk);
+    inline void factorize_from(arma::blas_int from_k, arma::blas_int to_m, const Vector &fk);
 
     static bool is_complex(Complex v, Scalar eps)
     {
@@ -136,13 +136,13 @@ private:
     }
 
     // Implicitly restarted Arnoldi factorization
-    inline void restart(int k);
+    inline void restart(arma::blas_int k);
 
     // Calculate the number of converged Ritz values
-    inline int num_converged(Scalar tol);
+    inline arma::blas_int num_converged(Scalar tol);
 
     // Return the adjusted nev for restarting
-    inline int nev_adjusted(int nconv);
+    inline arma::blas_int nev_adjusted(arma::blas_int nconv);
 
     // Retrieve and sort ritz values and ritz vectors
     inline void retrieve_ritzpair();
@@ -170,7 +170,7 @@ public:
     ///             in each iteration. This parameter must satisfy \f$nev+2 \le ncv \le n\f$,
     ///             and is advised to take \f$ncv \ge 2\cdot nev + 1\f$.
     ///
-    GenEigsSolver(OpType *op_, int nev_, int ncv_) :
+    GenEigsSolver(OpType *op_, arma::blas_int nev_, arma::blas_int ncv_) :
         op(op_),
         dim_n(op->rows()),
         nev(nev_),
@@ -214,17 +214,17 @@ public:
     ///
     /// \return Number of converged eigenvalues.
     ///
-    inline int compute(int maxit = 1000, Scalar tol = 1e-10);
+  inline arma::blas_int compute(arma::blas_int maxit = 1000, Scalar tol = 1e-10);
 
     ///
     /// Returning the number of iterations used in the computation.
     ///
-    inline int num_iterations() { return niter; }
+    inline arma::blas_int num_iterations() { return niter; }
 
     ///
     /// Returning the number of matrix operations used in the computation.
     ///
-    inline int num_operations() { return nmatop; }
+    inline arma::blas_int num_operations() { return nmatop; }
 
     ///
     /// Returning the converged eigenvalues.
@@ -244,7 +244,7 @@ public:
     /// Returned matrix type will be `arma::cx_mat` or `arma::cx_fmat`, depending on
     /// the template parameter `Scalar` defined.
     ///
-    inline ComplexMatrix eigenvectors(int nvec);
+    inline ComplexMatrix eigenvectors(arma::blas_int nvec);
     ///
     /// Returning all converged eigenvectors.
     ///
@@ -276,7 +276,7 @@ public:
 ///                       DenseGenRealShiftSolve.
 ///
 template <typename Scalar = double,
-          int SelectionRule = LARGEST_MAGN,
+          arma::blas_int SelectionRule = LARGEST_MAGN,
           typename OpType = DenseGenRealShiftSolve<double> >
 class GenEigsRealShiftSolver: public GenEigsSolver<Scalar, SelectionRule, OpType>
 {
@@ -313,7 +313,7 @@ public:
     ///               and is advised to take \f$ncv \ge 2\cdot nev + 1\f$.
     /// \param sigma_ The real-valued shift.
     ///
-    GenEigsRealShiftSolver(OpType *op_, int nev_, int ncv_, Scalar sigma_) :
+    GenEigsRealShiftSolver(OpType *op_, arma::blas_int nev_, arma::blas_int ncv_, Scalar sigma_) :
         GenEigsSolver<Scalar, SelectionRule, OpType>(op_, nev_, ncv_),
         sigma(sigma_)
     {
